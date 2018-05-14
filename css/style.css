@@ -30,3 +30,20 @@ h1 {
 h2 {
     color: #9a928d;
 }
+
+svg {
+    border: 1px solid #222222;
+    display: block;
+    margin: auto;
+    margin-top: 24px;
+}
+
+footer {
+    margin-top: 24px;
+    min-height: 4em;
+    background-color: #a83b27;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
