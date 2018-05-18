@@ -41,28 +41,59 @@
     </div>
 
     <script src="https://d3js.org/d3.v5.min.js"></script>
-    <!-- <script src="js/solo.js"></script> -->
-    <!-- <script src="js/party.js"></script> -->
 
     <script>
 
-      var partyMMR = d3.select("#party-mmr");
-
-      var graphWidth = +partyMMR.attr("width");
-      var graphHeight = +partyMMR.attr("height");
-
-      var padding = {t: 20, r: 20, b: 20, l: 20};
-
       d3.csv("data/party.csv").then(function(data) {
 
-      console.log(data);
+        console.log(data);
+        var padding = {t: 50, r: 50, b: 50, l: 80};
 
-      var MMROverTime = d3.nest()
-        .key(function(d) {
-          return d.MMR;
-        })
-        .entries(data);
-        console.log(MMROverTime);
+        var partyMMR = d3.select("#party-mmr");
+        var width = +partyMMR.attr("width") - padding.l - padding.r;
+        var height = +partyMMR.attr("height") - padding.t - padding.b;
+        var group = partyMMR.append("g")
+          .attr("transform", "translate(" + padding.l + ", " + padding.t + ")");
+        var xScale = d3.scaleLinear()
+          .domain(d3.extent([0, data.length]))
+          .range([0, width]);
+        var xAxis = d3.axisBottom(xScale);
+        group.append("g")
+          .attr("transform", "translate(0, " + height + ")")
+          .call(xAxis)
+          .append("text")
+          .attr("fill", "#000000")
+          .attr("font-size", "18px")
+          .attr("transform", "translate(" + [width / 2, 40] + ")")
+          .text("Time");
+        var yScale = d3.scaleLinear()
+          .domain([0, d3.max(data, function(d) { return d.MMR; })])
+          .domain(d3.extent(data, function(d) { return d.MMR; }))
+          .range([height, 0]);
+        var yAxis = d3.axisLeft(yScale);
+        group.append("g")
+          .call(yAxis)
+          .append("text")
+          .attr("fill", "#000000")
+          .attr("font-size", "18px")
+          .attr("transform", "translate(" + [-50, height / 2] + ") rotate(-90)")
+          .text("MMR");
+        var line = d3.line()
+          .x(function(d, i) { return xScale(i); })
+          .y(function(d) { return yScale(d.MMR); });
+        group.append("path")
+          .datum(data)
+          .attr("fill", "none")
+          .attr("stroke", "steelblue")
+          .attr("stroke-linejoin", "round")
+          .attr("stroke-linecap", "round")
+          .attr("stroke-width", 1.5)
+          .attr("d", line);
+        group.append("text")
+          .attr("fill", "#000000")
+          .attr("font-size", "24px")
+          .attr("transform", "translate(" + [width / 2 - padding.r - padding.l, -20] + ")")
+          .text("Party MMR Over Time");
 
       });
 
