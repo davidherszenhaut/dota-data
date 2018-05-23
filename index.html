@@ -17,21 +17,57 @@
     <link rel="stylesheet" type="text/css" href="css/style.css">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
 
+    <!--
+
+    TODO
+
+    - responsive svgs
+    - redesign landing page (100vh?)
+
+    |--------------------------------|
+    |                 |              |
+    | ---------       | ------------ |
+    | | Title |       | | Table    | |
+    | ---------       | | Of       | |
+    |                 | | Contents | |
+    | ------------    | |          | |
+    | | Subtitle |    | |          | |
+    | ------------    | ------------ |
+    |                 |              |
+    |--------------------------------|
+
+    -->
+
   </head>
   <body>
 
     <div id="container">
 
       <header>
-        <div id="headings">
+        <div id="title">
           <h1>Dota Data</h1>
-          <h2>Dota 2 Ranked Matchmaking Visualizations</h2>
+        </div>
+        <div id="subtitle">
+          <h2> Dota 2 Ranked Matchmaking Data Visualizations</h2>
+        </div>
+        <div id="contents">
+          <h3>Contents</h3>
+          <ul>
+            <li>Introduction</li>
+            <li>Overview</li>
+            <li>Changes Over Time</li>
+            <li>Hero Statistics</li>
         </div>
       </header>
 
       <div id="graphs">
         <svg width="960" height="540" id="party-mmr"></svg>
+        <svg width="960" height="540" id="party-mmr-change"></svg>
+        <svg width="960" height="540" id="party-mmr-absolute-change"></svg>
+
         <svg width="960" height="540" id="solo-mmr"></svg>
+        <svg width="960" height="540" id="solo-mmr-change"></svg>
+        <svg width="960" height="540" id="solo-mmr-absolute-change"></svg>
       </div>
 
       <footer>
@@ -49,7 +85,7 @@
         console.log(data);
         var padding = {t: 50, r: 50, b: 50, l: 80};
 
-        var partyMMR = d3.select("#party-mmr");
+        var partyMMR = d3.select("#party-mmr")
         var width = +partyMMR.attr("width") - padding.l - padding.r;
         var height = +partyMMR.attr("height") - padding.t - padding.b;
         var group = partyMMR.append("g")
@@ -65,7 +101,7 @@
           .attr("fill", "#000000")
           .attr("font-size", "18px")
           .attr("transform", "translate(" + [width / 2, 40] + ")")
-          .text("Time");
+          .text("Matches");
         var yScale = d3.scaleLinear()
           .domain([0, d3.max(data, function(d) { return d.MMR; })])
           .domain(d3.extent(data, function(d) { return d.MMR; }))
@@ -94,6 +130,59 @@
           .attr("font-size", "24px")
           .attr("transform", "translate(" + [width / 2 - padding.r - padding.l, -20] + ")")
           .text("Party MMR Over Time");
+
+      });
+
+      d3.csv("data/solo.csv").then(function(data) {
+
+        console.log(data);
+        var padding = {t: 50, r: 50, b: 50, l: 80};
+
+        var partyMMR = d3.select("#solo-mmr")
+        var width = +partyMMR.attr("width") - padding.l - padding.r;
+        var height = +partyMMR.attr("height") - padding.t - padding.b;
+        var group = partyMMR.append("g")
+          .attr("transform", "translate(" + padding.l + ", " + padding.t + ")");
+        var xScale = d3.scaleLinear()
+          .domain(d3.extent([0, data.length]))
+          .range([0, width]);
+        var xAxis = d3.axisBottom(xScale);
+        group.append("g")
+          .attr("transform", "translate(0, " + height + ")")
+          .call(xAxis)
+          .append("text")
+          .attr("fill", "#000000")
+          .attr("font-size", "18px")
+          .attr("transform", "translate(" + [width / 2, 40] + ")")
+          .text("Matches");
+        var yScale = d3.scaleLinear()
+          .domain([0, d3.max(data, function(d) { return d.MMR; })])
+          .domain(d3.extent(data, function(d) { return d.MMR; }))
+          .range([height, 0]);
+        var yAxis = d3.axisLeft(yScale);
+        group.append("g")
+          .call(yAxis)
+          .append("text")
+          .attr("fill", "#000000")
+          .attr("font-size", "18px")
+          .attr("transform", "translate(" + [-50, height / 2] + ") rotate(-90)")
+          .text("MMR");
+        var line = d3.line()
+          .x(function(d, i) { return xScale(i); })
+          .y(function(d) { return yScale(d.MMR); });
+        group.append("path")
+          .datum(data)
+          .attr("fill", "none")
+          .attr("stroke", "steelblue")
+          .attr("stroke-linejoin", "round")
+          .attr("stroke-linecap", "round")
+          .attr("stroke-width", 1.5)
+          .attr("d", line);
+        group.append("text")
+          .attr("fill", "#000000")
+          .attr("font-size", "24px")
+          .attr("transform", "translate(" + [width / 2 - padding.r - padding.l, -20] + ")")
+          .text("Solo MMR Over Time");
 
       });
 
