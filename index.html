@@ -21,20 +21,7 @@
 
     TODO
 
-    - responsive svgs
-    - redesign landing page (100vh?)
-
-    |--------------------------------|
-    |                 |              |
-    | ---------       | ------------ |
-    | | Title |       | | Table    | |
-    | ---------       | | Of       | |
-    |                 | | Contents | |
-    | ------------    | |          | |
-    | | Subtitle |    | |          | |
-    | ------------    | ------------ |
-    |                 |              |
-    |--------------------------------|
+    - responsive svg
 
     -->
 
@@ -55,7 +42,7 @@
           <ul>
             <li>Introduction</li>
             <li>Overview</li>
-            <li>Changes Over Time</li>
+            <li><a href="#party-mmr">Changes Over Time</a></li>
             <li>Hero Statistics</li>
         </div>
       </header>
@@ -64,10 +51,14 @@
         <svg width="960" height="540" id="party-mmr"></svg>
         <svg width="960" height="540" id="party-mmr-change"></svg>
         <svg width="960" height="540" id="party-mmr-absolute-change"></svg>
+        <svg width="960" height="540" id="party-roles"></svg>
+        <svg width="960" height="540" id="party-heroes"></svg>
 
         <svg width="960" height="540" id="solo-mmr"></svg>
         <svg width="960" height="540" id="solo-mmr-change"></svg>
         <svg width="960" height="540" id="solo-mmr-absolute-change"></svg>
+        <svg width="960" height="540" id="solo-roles"></svg>
+        <svg width="960" height="540" id="solo-heroes"></svg>
       </div>
 
       <footer>
@@ -80,11 +71,12 @@
 
     <script>
 
+      // PARTY
       d3.csv("data/party.csv").then(function(data) {
 
-        console.log(data);
         var padding = {t: 50, r: 50, b: 50, l: 80};
 
+        // MMR OVER TIME
         var partyMMR = d3.select("#party-mmr")
         var width = +partyMMR.attr("width") - padding.l - padding.r;
         var height = +partyMMR.attr("height") - padding.t - padding.b;
@@ -113,6 +105,7 @@
           .attr("fill", "#000000")
           .attr("font-size", "18px")
           .attr("transform", "translate(" + [-50, height / 2] + ") rotate(-90)")
+          .attr("text-anchor", "middle")
           .text("MMR");
         var line = d3.line()
           .x(function(d, i) { return xScale(i); })
@@ -128,16 +121,142 @@
         group.append("text")
           .attr("fill", "#000000")
           .attr("font-size", "24px")
-          .attr("transform", "translate(" + [width / 2 - padding.r - padding.l, -20] + ")")
+          .attr("transform", "translate(" + [width / 2, -20] + ")")
+          .attr("text-anchor", "middle")
           .text("Party MMR Over Time");
+
+        // ABSOLUTE MMR CHANGE OVER TIME
+        var partyMMRAbsChange = d3.select("#party-mmr-absolute-change")
+        var width = +partyMMRAbsChange.attr("width") - padding.l - padding.r;
+        var height = +partyMMRAbsChange.attr("height") - padding.t - padding.b;
+        var group = partyMMRAbsChange.append("g")
+          .attr("transform", "translate(" + padding.l + ", " + padding.t + ")");
+        var xScale = d3.scaleLinear()
+          .domain(d3.extent([0, data.length]))
+          .range([0, width]);
+        var xAxis = d3.axisBottom(xScale);
+        group.append("g")
+          .attr("transform", "translate(0, " + height + ")")
+          .call(xAxis)
+          .append("text")
+          .attr("fill", "#000000")
+          .attr("font-size", "18px")
+          .attr("transform", "translate(" + [width / 2, 40] + ")")
+          .text("Matches");
+        var yScale = d3.scaleLinear()
+          .domain([0, d3.max(data, function(d) { return Math.abs(d.Change); })])
+          .range([height, 0]);
+        var yAxis = d3.axisLeft(yScale);
+        group.append("g")
+          .call(yAxis)
+          .append("text")
+          .attr("fill", "#000000")
+          .attr("font-size", "18px")
+          .attr("transform", "translate(" + [-50, height / 2] + ") rotate(-90)")
+          .attr("text-anchor", "middle")
+          .text("Absolute MMR Change");
+        var line = d3.line()
+          .x(function(d, i) { return xScale(i); })
+          .y(function(d) { return yScale(Math.abs(d.Change)); });
+        group.append("path")
+          .datum(data)
+          .attr("fill", "none")
+          .attr("stroke", "steelblue")
+          .attr("stroke-linejoin", "round")
+          .attr("stroke-linecap", "round")
+          .attr("stroke-width", 1.5)
+          .attr("d", line);
+        var average = d3.sum(data, function(d) { return Math.abs(d.Change); }) / data.length;
+        var line = d3.line()
+          .x(function(d, i) { return xScale(i); })
+          .y(function(d, i) { return yScale(average); });
+        group.append("path")
+          .datum(data)
+          .attr("fill", "none")
+          .attr("stroke", "steelblue")
+          .attr("stroke-linejoin", "round")
+          .attr("stroke-linecap", "round")
+          .attr("stroke-width", 1.5)
+          .attr("d", line);
+        group.append("text")
+          .attr("fill", "#000000")
+          .attr("font-size", "24px")
+          .attr("transform", "translate(" + [width / 2, -20] + ")")
+          .attr("text-anchor", "middle")
+          .text("Absolute Party MMR Change Over Time");
+
+        // ROLES
+        var partyRoles = d3.select("#party-roles");
+        var width = +partyRoles.attr("width");
+        var height = +partyRoles.attr("height");
+        var radius = Math.min(width, height) / 2;
+        var group = partyRoles.append("g")
+          .attr("transform", "translate(" + [width / 2, height / 2] + ")");
+        var roles = d3.nest()
+          .key(function(d) {
+            return d.Role;
+          })
+          .entries(data);
+        var roleNames = roles.map(function(d) {
+          return d.key;
+        });
+        var colors = d3.scaleOrdinal(d3.schemeDark2);
+        var pie = d3.pie()
+          .value(function(d) { return d.values.length; });
+        var line = d3.arc()
+          .outerRadius(radius - 10)
+          .innerRadius(0);
+        var arc = group.selectAll(".arc")
+          .data(pie(roles))
+          .enter()
+          .append("g")
+          .attr("class", "arc")
+          .append("path")
+          .attr("d", line)
+          .attr("fill", function(d) {
+            return colors(d.data.key);
+          });
+
+        // HEROES
+        var partyHeroes = d3.select("#party-heroes");
+        var width = +partyHeroes.attr("width");
+        var height = +partyHeroes.attr("height");
+        var radius = Math.min(width, height) / 2;
+        var group = partyHeroes.append("g")
+          .attr("transform", "translate(" + [width / 2, height / 2] + ")");
+        var heroes = d3.nest()
+          .key(function(d) {
+            return d.Hero;
+          })
+          .entries(data);
+        var heroNames = heroes.map(function(d) {
+          return d.key;
+        });
+        var colors = d3.scaleOrdinal(d3.schemeDark2);
+        var pie = d3.pie()
+          .value(function(d) { return d.values.length; });
+        var line = d3.arc()
+          .outerRadius(radius - 10)
+          .innerRadius(0);
+        var arc = group.selectAll(".arc")
+          .data(pie(heroes))
+          .enter()
+          .append("g")
+          .attr("class", "arc")
+          .append("path")
+          .attr("d", line)
+          .attr("fill", function(d) {
+            return colors(d.data.key);
+          });
 
       });
 
+      // SOLO
       d3.csv("data/solo.csv").then(function(data) {
 
-        console.log(data);
         var padding = {t: 50, r: 50, b: 50, l: 80};
 
+        // MMR OVER TIME
         var partyMMR = d3.select("#solo-mmr")
         var width = +partyMMR.attr("width") - padding.l - padding.r;
         var height = +partyMMR.attr("height") - padding.t - padding.b;
@@ -181,8 +300,133 @@
         group.append("text")
           .attr("fill", "#000000")
           .attr("font-size", "24px")
-          .attr("transform", "translate(" + [width / 2 - padding.r - padding.l, -20] + ")")
+          .attr("transform", "translate(" + [width / 2, -20] + ")")
+          .attr("text-anchor", "middle")
           .text("Solo MMR Over Time");
+
+        // ABSOLUTE MMR CHANGE OVER TIME
+        var soloMMRAbsChange = d3.select("#solo-mmr-absolute-change")
+        var width = +soloMMRAbsChange.attr("width") - padding.l - padding.r;
+        var height = +soloMMRAbsChange.attr("height") - padding.t - padding.b;
+        var group = soloMMRAbsChange.append("g")
+          .attr("transform", "translate(" + padding.l + ", " + padding.t + ")");
+        var xScale = d3.scaleLinear()
+          .domain(d3.extent([0, data.length]))
+          .range([0, width]);
+        var xAxis = d3.axisBottom(xScale);
+        group.append("g")
+          .attr("transform", "translate(0, " + height + ")")
+          .call(xAxis)
+          .append("text")
+          .attr("fill", "#000000")
+          .attr("font-size", "18px")
+          .attr("transform", "translate(" + [width / 2, 40] + ")")
+          .text("Matches");
+        var yScale = d3.scaleLinear()
+          .domain([0, d3.max(data, function(d) { return Math.abs(d.Change); })])
+          .range([height, 0]);
+        var yAxis = d3.axisLeft(yScale);
+        group.append("g")
+          .call(yAxis)
+          .append("text")
+          .attr("fill", "#000000")
+          .attr("font-size", "18px")
+          .attr("transform", "translate(" + [-50, height / 2] + ") rotate(-90)")
+          .attr("text-anchor", "middle")
+          .text("Absolute MMR Change");
+        var line = d3.line()
+          .x(function(d, i) { return xScale(i); })
+          .y(function(d) { return yScale(Math.abs(d.Change)); });
+        group.append("path")
+          .datum(data)
+          .attr("fill", "none")
+          .attr("stroke", "steelblue")
+          .attr("stroke-linejoin", "round")
+          .attr("stroke-linecap", "round")
+          .attr("stroke-width", 1.5)
+          .attr("d", line);
+        var average = d3.sum(data, function(d) { return Math.abs(d.Change); }) / data.length;
+        var line = d3.line()
+          .x(function(d, i) { return xScale(i); })
+          .y(function(d, i) { return yScale(average); });
+        group.append("path")
+          .datum(data)
+          .attr("fill", "none")
+          .attr("stroke", "steelblue")
+          .attr("stroke-linejoin", "round")
+          .attr("stroke-linecap", "round")
+          .attr("stroke-width", 1.5)
+          .attr("d", line);
+        group.append("text")
+          .attr("fill", "#000000")
+          .attr("font-size", "24px")
+          .attr("transform", "translate(" + [width / 2, -20] + ")")
+          .attr("text-anchor", "middle")
+          .text("Absolute Solo MMR Change Over Time");
+
+        // ROLES
+        var soloRoles = d3.select("#solo-roles");
+        var width = +soloRoles.attr("width");
+        var height = +soloRoles.attr("height");
+        var radius = Math.min(width, height) / 2;
+        var group = soloRoles.append("g")
+          .attr("transform", "translate(" + [width / 2, height / 2] + ")");
+        var roles = d3.nest()
+          .key(function(d) {
+            return d.Role;
+          })
+          .entries(data);
+        var roleNames = roles.map(function(d) {
+          return d.key;
+        });
+        var colors = d3.scaleOrdinal(d3.schemeDark2);
+        var pie = d3.pie()
+          .value(function(d) { return d.values.length; });
+        var line = d3.arc()
+          .outerRadius(radius - 10)
+          .innerRadius(0);
+        var arc = group.selectAll(".arc")
+          .data(pie(roles))
+          .enter()
+          .append("g")
+          .attr("class", "arc")
+          .append("path")
+          .attr("d", line)
+          .attr("fill", function(d) {
+            return colors(d.data.key);
+          });
+
+        // HEROES
+        var soloHeroes = d3.select("#solo-heroes");
+        var width = +soloHeroes.attr("width");
+        var height = +soloHeroes.attr("height");
+        var radius = Math.min(width, height) / 2;
+        var group = soloHeroes.append("g")
+          .attr("transform", "translate(" + [width / 2, height / 2] + ")");
+        var heroes = d3.nest()
+          .key(function(d) {
+            return d.Hero;
+          })
+          .entries(data);
+        var heroNames = heroes.map(function(d) {
+          return d.key;
+        });
+        var colors = d3.scaleOrdinal(d3.schemeDark2);
+        var pie = d3.pie()
+          .value(function(d) { return d.values.length; });
+        var line = d3.arc()
+          .outerRadius(radius - 10)
+          .innerRadius(0);
+        var arc = group.selectAll(".arc")
+          .data(pie(heroes))
+          .enter()
+          .append("g")
+          .attr("class", "arc")
+          .append("path")
+          .attr("d", line)
+          .attr("fill", function(d) {
+            return colors(d.data.key);
+          });
 
       });
 
