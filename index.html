@@ -125,6 +125,54 @@
           .attr("text-anchor", "middle")
           .text("Party MMR Over Time");
 
+        // MMR CHANGE OVER TIME
+        var partyMMRChange = d3.select("#party-mmr-change")
+        var width = +partyMMRChange.attr("width") - padding.l - padding.r;
+        var height = +partyMMRChange.attr("height") - padding.t - padding.b;
+        var group = partyMMRChange.append("g")
+          .attr("transform", "translate(" + padding.l + ", " + padding.t + ")");
+        var xScale = d3.scaleLinear()
+          .domain(d3.extent([0, data.length]))
+          .range([0, width]);
+        var xAxis = d3.axisBottom(xScale);
+        group.append("g")
+          .attr("transform", "translate(0, " + height + ")")
+          .call(xAxis)
+          .append("text")
+          .attr("fill", "#000000")
+          .attr("font-size", "18px")
+          .attr("transform", "translate(" + [width / 2, 40] + ")")
+          .text("Matches");
+        var yScale = d3.scaleLinear()
+          .domain(d3.extent(data, function(d) { return +d.Change; }))
+          .range([height, 0]);
+        var yAxis = d3.axisLeft(yScale);
+        group.append("g")
+          .call(yAxis)
+          .append("text")
+          .attr("fill", "#000000")
+          .attr("font-size", "18px")
+          .attr("transform", "translate(" + [-50, height / 2] + ") rotate(-90)")
+          .attr("text-anchor", "middle")
+          .text("MMR Change");
+        var line = d3.line()
+          .x(function(d, i) { return xScale(i); })
+          .y(function(d) { return yScale(d.Change); });
+        group.append("path")
+          .datum(data)
+          .attr("fill", "none")
+          .attr("stroke", "steelblue")
+          .attr("stroke-linejoin", "round")
+          .attr("stroke-linecap", "round")
+          .attr("stroke-width", 1.5)
+          .attr("d", line);
+        group.append("text")
+          .attr("fill", "#000000")
+          .attr("font-size", "24px")
+          .attr("transform", "translate(" + [width / 2, -20] + ")")
+          .attr("text-anchor", "middle")
+          .text("Party MMR Change Over Time");
+
         // ABSOLUTE MMR CHANGE OVER TIME
         var partyMMRAbsChange = d3.select("#party-mmr-absolute-change")
         var width = +partyMMRAbsChange.attr("width") - padding.l - padding.r;
@@ -303,6 +351,54 @@
           .attr("transform", "translate(" + [width / 2, -20] + ")")
           .attr("text-anchor", "middle")
           .text("Solo MMR Over Time");
+
+        // MMR CHANGE OVER TIME
+        var soloMMRChange = d3.select("#solo-mmr-change")
+        var width = +soloMMRChange.attr("width") - padding.l - padding.r;
+        var height = +soloMMRChange.attr("height") - padding.t - padding.b;
+        var group = soloMMRChange.append("g")
+          .attr("transform", "translate(" + padding.l + ", " + padding.t + ")");
+        var xScale = d3.scaleLinear()
+          .domain(d3.extent([0, data.length]))
+          .range([0, width]);
+        var xAxis = d3.axisBottom(xScale);
+        group.append("g")
+          .attr("transform", "translate(0, " + height + ")")
+          .call(xAxis)
+          .append("text")
+          .attr("fill", "#000000")
+          .attr("font-size", "18px")
+          .attr("transform", "translate(" + [width / 2, 40] + ")")
+          .text("Matches");
+        var yScale = d3.scaleLinear()
+          .domain(d3.extent(data, function(d) { return +d.Change; }))
+          .range([height, 0]);
+        var yAxis = d3.axisLeft(yScale);
+        group.append("g")
+          .call(yAxis)
+          .append("text")
+          .attr("fill", "#000000")
+          .attr("font-size", "18px")
+          .attr("transform", "translate(" + [-50, height / 2] + ") rotate(-90)")
+          .attr("text-anchor", "middle")
+          .text("MMR Change");
+        var line = d3.line()
+          .x(function(d, i) { return xScale(i); })
+          .y(function(d) { return yScale(d.Change); });
+        group.append("path")
+          .datum(data)
+          .attr("fill", "none")
+          .attr("stroke", "steelblue")
+          .attr("stroke-linejoin", "round")
+          .attr("stroke-linecap", "round")
+          .attr("stroke-width", 1.5)
+          .attr("d", line);
+        group.append("text")
+          .attr("fill", "#000000")
+          .attr("font-size", "24px")
+          .attr("transform", "translate(" + [width / 2, -20] + ")")
+          .attr("text-anchor", "middle")
+          .text("Solo MMR Change Over Time");
 
         // ABSOLUTE MMR CHANGE OVER TIME
         var soloMMRAbsChange = d3.select("#solo-mmr-absolute-change")
