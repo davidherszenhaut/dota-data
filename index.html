@@ -33,6 +33,12 @@
     - responsive svg
     - scroll back to top button
     - add section headers
+    - option to reorder bar graph by value/alphabetically
+    - uniform language in todo
+    - uniform order of d3 code (xAxis/yAxis together, similar axis creation, translate [, ])
+    - hero icon on bar graph hover
+    - fix color schemes
+    - axis values (whole numbers for matches)
 
     -->
 
@@ -80,8 +86,10 @@
         <p>There are currently over 110 heroes in Dota 2. In each game, each player must pick a unique hero to play as. Each of the five players is given a position or role for the game. In general, these roles are: Carry (1), Mid (2), Offlane (3), Roam (4), and Support (5). The position number determines which character gets priority for resources like gold and experience. The lower the number, the higher the priority.</p>
         <svg width="960" height="540" id="party-roles"></svg>
         <svg width="960" height="540" id="party-heroes"></svg>
+        <svg width="960" height="540" id="party-heroes-bar"></svg>
         <svg width="960" height="540" id="solo-roles"></svg>
         <svg width="960" height="540" id="solo-heroes"></svg>
+        <svg width="960" height="540" id="solo-heroes-bar"></svg>
       </div>
 
       <footer>
@@ -332,6 +340,53 @@
           .attr("text-anchor", "middle")
           .text("Party Heroes");
 
+        // HEROES BAR
+        var partyHeroesBar = d3.select("#party-heroes-bar");
+        var width = +partyHeroesBar.attr("width") - padding.l - padding.r;
+        var height = +partyHeroesBar.attr("height") - padding.t - padding.b;
+        var group = partyHeroesBar.append("g")
+          .attr("transform", "translate(" + [padding.l, padding.t] + ")");
+        var xScale = d3.scaleBand()
+          .domain(heroNames)
+          .rangeRound([0, width])
+          .padding(0.1);
+        var yScale = d3.scaleLinear()
+          .domain([0, d3.max(heroes, function(d) { return d.values.length; })])
+          .rangeRound([height, 0]);
+        group.append("g")
+          .attr("transform", "translate(0, " + height + ")")
+          .call(d3.axisBottom(xScale))
+          .selectAll("text")
+          .style("text-anchor", "start")
+          .attr("y", 0)
+          .attr("x", 5)
+          .attr("transform", "rotate(45)");
+        group.append("g")
+          .call(d3.axisLeft(yScale))
+          .append("text")
+          .attr("fill", "#000000")
+          .attr("font-size", "18px")
+          .attr("transform", "translate(" + [-50, height / 2] + ") rotate(-90)")
+          .text("Matches");
+        group.selectAll(".bar")
+          .data(heroes)
+          .enter()
+          .append("rect")
+          .attr("class", "bar")
+          .attr("x", function(d) { return xScale(d.key); })
+          .attr("y", function(d) { return yScale(d.values.length); })
+          .attr("width", xScale.bandwidth())
+          .attr("height", function(d) { return height - yScale(d.values.length); })
+          .attr("fill", function(d) {
+            return colors(d.key);
+          });
+        group.append("text")
+          .attr("fill", "#000000")
+          .attr("font-size", "24px")
+          .attr("transform", "translate(" + [width / 2, -20] + ")")
+          .attr("text-anchor", "middle")
+          .text("Party Heroes");
+
       });
 
       // SOLO
@@ -568,6 +623,53 @@
           .attr("fill", "#000000")
           .attr("font-size", "24px")
           .attr("transform", "translate(" + [width / 2, -(height / 2.5)] + ")")
+          .attr("text-anchor", "middle")
+          .text("Solo Heroes");
+
+        // HEROES BAR
+        var soloHeroesBar = d3.select("#solo-heroes-bar");
+        var width = +soloHeroesBar.attr("width") - padding.l - padding.r;
+        var height = +soloHeroesBar.attr("height") - padding.t - padding.b;
+        var group = soloHeroesBar.append("g")
+          .attr("transform", "translate(" + [padding.l, padding.t] + ")");
+        var xScale = d3.scaleBand()
+          .domain(heroNames)
+          .rangeRound([0, width])
+          .padding(0.1);
+        var yScale = d3.scaleLinear()
+          .domain([0, d3.max(heroes, function(d) { return d.values.length; })])
+          .rangeRound([height, 0]);
+        group.append("g")
+          .attr("transform", "translate(0, " + height + ")")
+          .call(d3.axisBottom(xScale))
+          .selectAll("text")
+          .style("text-anchor", "start")
+          .attr("y", 0)
+          .attr("x", 5)
+          .attr("transform", "rotate(45)");
+        group.append("g")
+          .call(d3.axisLeft(yScale))
+          .append("text")
+          .attr("fill", "#000000")
+          .attr("font-size", "18px")
+          .attr("transform", "translate(" + [-50, height / 2] + ") rotate(-90)")
+          .text("Matches");
+        group.selectAll(".bar")
+          .data(heroes)
+          .enter()
+          .append("rect")
+          .attr("class", "bar")
+          .attr("x", function(d) { return xScale(d.key); })
+          .attr("y", function(d) { return yScale(d.values.length); })
+          .attr("width", xScale.bandwidth())
+          .attr("height", function(d) { return height - yScale(d.values.length); })
+          .attr("fill", function(d) {
+            return colors(d.key);
+          });
+        group.append("text")
+          .attr("fill", "#000000")
+          .attr("font-size", "24px")
+          .attr("transform", "translate(" + [width / 2, -20] + ")")
           .attr("text-anchor", "middle")
           .text("Solo Heroes");
 
