@@ -21,6 +21,15 @@
 
     TODO
 
+    - separate party and solo views
+    - write introduction paragraph
+    - party mmr change over time x axis label
+    - axis tick readability
+    - average line for line graphs
+    - hover tooltip for line graphs
+    - hover tooltip in corner of graph for pie charts
+    - heroes bar graphs
+    - games per day histogram
     - responsive svg
 
     -->
@@ -134,18 +143,18 @@
         var xScale = d3.scaleLinear()
           .domain(d3.extent([0, data.length]))
           .range([0, width]);
+        var yScale = d3.scaleLinear()
+          .domain(d3.extent(data, function(d) { return +d.Change; }))
+          .range([height, 0]);
         var xAxis = d3.axisBottom(xScale);
         group.append("g")
-          .attr("transform", "translate(0, " + height + ")")
+          .attr("transform", "translate(0, " + yScale(0) + ")")
           .call(xAxis)
           .append("text")
           .attr("fill", "#000000")
           .attr("font-size", "18px")
-          .attr("transform", "translate(" + [width / 2, 40] + ")")
+          .attr("transform", "translate(" + [width / 2, height / 2 + 40] + ")")
           .text("Matches");
-        var yScale = d3.scaleLinear()
-          .domain(d3.extent(data, function(d) { return +d.Change; }))
-          .range([height, 0]);
         var yAxis = d3.axisLeft(yScale);
         group.append("g")
           .call(yAxis)
@@ -361,18 +370,18 @@
         var xScale = d3.scaleLinear()
           .domain(d3.extent([0, data.length]))
           .range([0, width]);
+        var yScale = d3.scaleLinear()
+          .domain(d3.extent(data, function(d) { return +d.Change; }))
+          .range([height, 0]);
         var xAxis = d3.axisBottom(xScale);
         group.append("g")
-          .attr("transform", "translate(0, " + height + ")")
+          .attr("transform", "translate(0, " + yScale(0) + ")")
           .call(xAxis)
           .append("text")
           .attr("fill", "#000000")
           .attr("font-size", "18px")
-          .attr("transform", "translate(" + [width / 2, 40] + ")")
+          .attr("transform", "translate(" + [width / 2, height / 2 + 40] + ")")
           .text("Matches");
-        var yScale = d3.scaleLinear()
-          .domain(d3.extent(data, function(d) { return +d.Change; }))
-          .range([height, 0]);
         var yAxis = d3.axisLeft(yScale);
         group.append("g")
           .call(yAxis)
