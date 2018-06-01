@@ -42,13 +42,23 @@ li {
     margin-left: -20px;
 }
 
-li:before {
-    content: "# ";
+a:link {
+    color: #bdb4ae;
+    text-decoration: none;
+}
+
+a:visited {
     color: #bdb4ae;
 }
 
-li:hover {
+a:hover {
+    color: #9a928d;
     text-decoration: underline;
+}
+
+li:before {
+    content: "# ";
+    color: #bdb4ae;
 }
 
 #contents {
