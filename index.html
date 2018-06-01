@@ -31,6 +31,7 @@
     - heroes bar graphs
     - games per day histogram
     - responsive svg
+    - scroll back to top button
 
     -->
 
@@ -49,23 +50,31 @@
         <div id="contents">
           <h3>Contents</h3>
           <ul>
-            <li>Introduction</li>
-            <li>Overview</li>
-            <li><a href="#party-mmr">Changes Over Time</a></li>
-            <li>Hero Statistics</li>
+            <li><a href="#introduction">Introduction</a></li>
+            <li><a href="#overview">Overview</a></li>
+            <li><a href="#mmr-graphs">Changes Over Time</a></li>
+            <li><a href="#hero-role-graphs">Hero and Role Statistics</a></li>
         </div>
       </header>
 
-      <div id="graphs">
+      <div id="introduction">
+      </div>
+
+      <div id="overview">
+      </div>
+
+      <div id="mmr-graphs">
         <svg width="960" height="540" id="party-mmr"></svg>
         <svg width="960" height="540" id="party-mmr-change"></svg>
         <svg width="960" height="540" id="party-mmr-absolute-change"></svg>
-        <svg width="960" height="540" id="party-roles"></svg>
-        <svg width="960" height="540" id="party-heroes"></svg>
-
         <svg width="960" height="540" id="solo-mmr"></svg>
         <svg width="960" height="540" id="solo-mmr-change"></svg>
         <svg width="960" height="540" id="solo-mmr-absolute-change"></svg>
+      </div>
+
+      <div id="hero-role-graphs">
+        <svg width="960" height="540" id="party-roles"></svg>
+        <svg width="960" height="540" id="party-heroes"></svg>
         <svg width="960" height="540" id="solo-roles"></svg>
         <svg width="960" height="540" id="solo-heroes"></svg>
       </div>
@@ -248,7 +257,7 @@
         var height = +partyRoles.attr("height");
         var radius = Math.min(width, height) / 2;
         var group = partyRoles.append("g")
-          .attr("transform", "translate(" + [width / 2, height / 2] + ")");
+          .attr("transform", "translate(" + [width / 2 - padding.r - padding.l, height / 2] + ")");
         var roles = d3.nest()
           .key(function(d) {
             return d.Role;
@@ -273,6 +282,12 @@
           .attr("fill", function(d) {
             return colors(d.data.key);
           });
+        group.append("text")
+          .attr("fill", "#000000")
+          .attr("font-size", "24px")
+          .attr("transform", "translate(" + [width / 2, -(height / 2.5)] + ")")
+          .attr("text-anchor", "middle")
+          .text("Party Roles");
 
         // HEROES
         var partyHeroes = d3.select("#party-heroes");
@@ -280,7 +295,7 @@
         var height = +partyHeroes.attr("height");
         var radius = Math.min(width, height) / 2;
         var group = partyHeroes.append("g")
-          .attr("transform", "translate(" + [width / 2, height / 2] + ")");
+          .attr("transform", "translate(" + [width / 2 - padding.r - padding.l, height / 2] + ")");
         var heroes = d3.nest()
           .key(function(d) {
             return d.Hero;
@@ -305,6 +320,12 @@
           .attr("fill", function(d) {
             return colors(d.data.key);
           });
+        group.append("text")
+          .attr("fill", "#000000")
+          .attr("font-size", "24px")
+          .attr("transform", "translate(" + [width / 2, -(height / 2.5)] + ")")
+          .attr("text-anchor", "middle")
+          .text("Party Heroes");
 
       });
 
@@ -475,7 +496,7 @@
         var height = +soloRoles.attr("height");
         var radius = Math.min(width, height) / 2;
         var group = soloRoles.append("g")
-          .attr("transform", "translate(" + [width / 2, height / 2] + ")");
+          .attr("transform", "translate(" + [width / 2 - padding.r - padding.l, height / 2] + ")");
         var roles = d3.nest()
           .key(function(d) {
             return d.Role;
@@ -500,6 +521,12 @@
           .attr("fill", function(d) {
             return colors(d.data.key);
           });
+        group.append("text")
+          .attr("fill", "#000000")
+          .attr("font-size", "24px")
+          .attr("transform", "translate(" + [width / 2, -(height / 2.5)] + ")")
+          .attr("text-anchor", "middle")
+          .text("Solo Roles");
 
         // HEROES
         var soloHeroes = d3.select("#solo-heroes");
@@ -507,7 +534,7 @@
         var height = +soloHeroes.attr("height");
         var radius = Math.min(width, height) / 2;
         var group = soloHeroes.append("g")
-          .attr("transform", "translate(" + [width / 2, height / 2] + ")");
+          .attr("transform", "translate(" + [width / 2 - padding.r - padding.l, height / 2] + ")");
         var heroes = d3.nest()
           .key(function(d) {
             return d.Hero;
@@ -532,6 +559,12 @@
           .attr("fill", function(d) {
             return colors(d.data.key);
           });
+        group.append("text")
+          .attr("fill", "#000000")
+          .attr("font-size", "24px")
+          .attr("transform", "translate(" + [width / 2, -(height / 2.5)] + ")")
+          .attr("text-anchor", "middle")
+          .text("Solo Heroes");
 
       });
 
