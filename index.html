@@ -117,6 +117,8 @@
 
         // MMR OVER TIME
         var partyMMR = d3.select("#party-mmr")
+        partyMMR.attr("width", window.innerWidth * .9);
+        partyMMR.attr("height", window.innerHeight * .4);
         var width = +partyMMR.attr("width") - padding.l - padding.r;
         var height = +partyMMR.attr("height") - padding.t - padding.b;
         var group = partyMMR.append("g")
