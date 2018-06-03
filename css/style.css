@@ -129,16 +129,20 @@ html, body {
 
 header {
   text-align: center;
+  padding: 1rem;
 }
 
 #title h1 {
   font-weight: 700;
   margin: 0;
+  padding: 0.5rem;
 }
 
 #subtitle h2 {
   font-weight: 400;
   margin: 0;
+  color: #888888;
+  padding: 0.5rem;
 }
 
 #contents h3 {
@@ -147,12 +151,33 @@ header {
 }
 
 #contents ul {
-  /*display: inline-block;*/
   list-style: none;
+  display: inline-block;
 }
 
 #contents li {
   text-align: left;
+}
+
+#contents li a {
+  text-decoration: none;
+}
+
+#contents li a:link {
+  color: #000000;
+}
+
+#contents li a:visited {
+  color: #000000;
+}
+
+#contents li a:hover {
+  text-decoration: underline;
+  color: #888888;
+}
+
+#contents li a:active {
+  color: #888888;
 }
 
 #contents li:before {
@@ -164,6 +189,9 @@ header {
   font-weight: 400;
   margin: 0;
   text-align: center;
+  padding: 1rem;
+  background: #444444;
+  color: #eeeeee;
 }
 
 p {
@@ -182,6 +210,9 @@ svg {
 
 footer {
   text-align: center;
+  background: #444444;
+  color: #eeeeee;
+  padding: 1rem;
 }
 
 footer h2 {
