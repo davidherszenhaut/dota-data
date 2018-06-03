@@ -133,14 +133,17 @@ header {
 
 #title h1 {
   font-weight: 700;
+  margin: 0;
 }
 
 #subtitle h2 {
   font-weight: 400;
+  margin: 0;
 }
 
 #contents h3 {
   font-weight: 400;
+  margin: 0;
 }
 
 #contents ul {
@@ -157,6 +160,12 @@ header {
   padding-right: 0.5rem;
 }
 
+.section-header {
+  font-weight: 400;
+  margin: 0;
+  text-align: center;
+}
+
 p {
   width: 90vw;
   margin: auto;
@@ -165,10 +174,17 @@ p {
 
 svg {
   border: 1px solid #111111;
+  width: 90vw;
+  height: 40vw;
+  display: block;
+  margin: 1rem auto;
+}
+
+footer {
+  text-align: center;
 }
 
 footer h2 {
-  text-align: center;
   font-weight: 400;
   font-size: 1rem;
 }
