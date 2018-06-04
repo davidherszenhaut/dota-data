@@ -1,7 +1,7 @@
 /*body {
   margin: 0;
   padding: 0;
-  font-family: "Open Sans", sans-serif;
+  font-family: "Roboto Condensed", sans-serif;
 }
 
 #container {
@@ -124,7 +124,7 @@ footer {
 html, body {
   padding: 0;
   margin: 0;
-  font-family: "Open Sans", sans-serif;
+  font-family: "Roboto Condensed", sans-serif;
 }
 
 header {
@@ -203,9 +203,13 @@ p {
 svg {
   border: 1px solid #111111;
   width: 90vw;
-  height: 40vw;
+  height: 50vw;
   display: block;
   margin: 1rem auto;
+}
+
+text {
+  font-family: "Roboto Condensed", sans-serif;
 }
 
 footer {

@@ -15,7 +15,7 @@
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
 
     <link rel="stylesheet" type="text/css" href="css/style.css">
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
 
     <!--
 
@@ -23,8 +23,6 @@
 
     - fix graphs
     - fix color schemes
-    - add section headers
-    - reset margin/paddings
     - continue writing paragraphs
     - underline anchor tag animation
     - look over axis tick readability
@@ -32,9 +30,11 @@
     - research how to make responsive svg
     - create floating scroll back to top button
     - create "Party/Solo Games Per Day" histogram
+    - move repeated .attr and .style calls to css
     - add hero icon on bar graph hover (dota api?)
     - create toggle switch for party and solo views
     - experiment with average lines for line graphs
+    - look at replacing spacer math with padding calls
     - look over axis values (whole numbers for matches)
     - create hover tooltip for pie charts (corner of graph)
     - add option to reorder bar graph by value/alphabetically
@@ -80,7 +80,7 @@
 
       <div id="mmr-graphs">
         <h4 class="section-header">Changes Over Time</h4>
-        <p>Dota 2 tracks each player's skill progression using their Matchmaking Ranking (MMR). This value is separate for solo queue and party queue games and is updated after every ranked match.</p>
+        <p>Dota 2 tracks each player's skill progression using their Matchmaking Ranking (MMR). This value is separate for solo queue and party queue games and is updated after every ranked match. You can use the dropdown menu in the bottom left to switch between solo queue and party queue visualizations.</p>
         <svg class="party" id="party-mmr"></svg>
         <svg class="party" id="party-mmr-change"></svg>
         <svg class="party" id="party-mmr-absolute-change"></svg>
@@ -91,12 +91,12 @@
 
       <div id="hero-role-graphs">
         <h4 class="section-header">Hero and Role Statistics</h4>
-        <p>There are currently over 110 heroes in Dota 2. In each game, each player must pick a unique hero to play as. Each of the five players is given a position or role for the game. In general, these roles are: Carry (1), Mid (2), Offlane (3), Roam (4), and Support (5). The position number determines which character gets priority for resources like gold and experience. The lower the number, the higher the priority.</p>
+        <p>There are currently over 110 heroes in Dota 2. In each game, each player must pick a unique hero to control. Each of the five players is given a position or role for the game. In general, these roles are: Carry (1), Mid (2), Offlane (3), Roam (4), and Support (5). The position number determines which character gets priority for resources like gold and experience. The lower the number, the higher the priority.</p>
         <svg class="party" id="party-roles"></svg>
-        <svg class="party" id="party-heroes"></svg>
+        <svg class="party" id="party-heroes-pie"></svg>
         <svg class="party" id="party-heroes-bar"></svg>
         <svg class="solo" id="solo-roles"></svg>
-        <svg class="solo" id="solo-heroes"></svg>
+        <svg class="solo" id="solo-heroes-pie"></svg>
         <svg class="solo" id="solo-heroes-bar"></svg>
       </div>
 
@@ -112,13 +112,107 @@
 
     <script>
 
-      var padding = {t: 0, r: 0, b: 0, l: 0};
+      var spacer = window.innerWidth * 0.05;
+      var padding = {t: spacer * 2, r: spacer * 2, b: spacer * 2, l: spacer * 3};
 
       d3.csv("data/party.csv").then(function(data) {
 
-        console.log(data);
-        console.log(window.innerWidth);
-        console.log(window.innerHeight);
+        // PARTY-MMR
+        var svg = d3.select("#party-mmr");
+        svg.attr("width", window.innerWidth * 0.9);
+        svg.attr("height", window.innerWidth * 0.5);
+        var width = svg.attr("width") - padding.l - padding.r;
+        var height = svg.attr("height") - padding.t - padding.b;
+        var group = svg.append("g")
+          .attr("transform", "translate(" + [padding.l, padding.t] + ")");
+        var xScale = d3.scaleLinear()
+          .domain([0, data.length])
+          .range([0, width]);
+        var xAxis = d3.axisBottom(xScale);
+        group.append("g")
+          .attr("transform", "translate(" + [0, height] + ")")
+          .call(xAxis)
+          .append("text")
+          .attr("fill", "#000000")
+          .attr("text-anchor", "middle")
+          .attr("transform", "translate(" + [width / 2, spacer * 1.75] + ")")
+          .text("Matches");
+        var yScale = d3.scaleLinear()
+          .domain(d3.extent(data, function(d) { return d.MMR; }))
+          .range([height, 0]);
+        var yAxis = d3.axisLeft(yScale);
+        group.append("g")
+          .call(yAxis)
+          .append("text")
+          .attr("fill", "#000000")
+          .attr("text-anchor", "middle")
+          .attr("transform", "translate(" + [-spacer * 2.25, height / 2] + ") rotate(-90)")
+          .text("MMR");
+        var line = d3.line()
+          .x(function(d, i) { return xScale(i); })
+          .y(function(d) { return yScale(d.MMR); });
+        group.append("path")
+          .datum(data)
+          .attr("fill", "none")
+          .attr("stroke", "#000000")
+          .attr("d", line);
+        group.append("text")
+          .attr("transform", "translate(" + [width / 2, -spacer] + ")")
+          .attr("text-anchor", "middle")
+          .text("Party MMR Over Time");
+
+        // PARTY-MMR-CHANGE
+        var svg = d3.select("#party-mmr-change");
+        svg.attr("width", window.innerWidth * 0.9);
+        svg.attr("height", window.innerWidth * 0.5);
+        var width = svg.attr("width") - padding.l - padding.r;
+        var height = svg.attr("height") - padding.t - padding.b;
+        var group = svg.append("g")
+          .attr("transform", "translate(" + [padding.l, padding.t] + ")");
+        var xScale = d3.scaleLinear()
+          .domain(d3.extent([0, data.length]))
+          .range([0, width]);
+        var xAxis = d3.axisBottom(xScale);
+        var yScale = d3.scaleLinear()
+          .domain(d3.extent(data, function(d) { return +d.Change; }))
+          .range([height, 0]);
+        var yAxis = d3.axisLeft(yScale);
+        group.append("g")
+          .attr("transform", "translate(" + [0, yScale(0)] + ")")
+          .call(xAxis)
+          .append("text")
+          .attr("fill", "#000000")
+          .attr("text-anchor", "middle")
+          .attr("transform", "translate(" + [width / 2, spacer * 5] + ")")
+          .text("Matches");
+        group.append("g")
+          .call(yAxis)
+          .append("text")
+          .attr("fill", "#000000")
+          .attr("text-anchor", "middle")
+          .attr("transform", "translate(" + [-spacer * 2.25, height / 2] + ") rotate(-90)")
+          .text("MMR Change");
+        var line = d3.line()
+          .x(function(d, i) { return xScale(i); })
+          .y(function(d) { return yScale(d.Change); });
+        group.append("path")
+          .datum(data)
+          .attr("fill", "none")
+          .attr("stroke", "#000000")
+          .attr("d", line);
+        group.append("text")
+          .attr("fill", "#000000")
+          .attr("transform", "translate(" + [width / 2, -spacer] + ")")
+          .attr("text-anchor", "middle")
+          .text("Party MMR Change Over Time");
+
+        // PARTY-MMR-ABSOLUTE-CHANGE
+
+        // PARTY-ROLES
+
+        // PARTY-HEROES-PIE
+
+        // PARTY-HEROES-BAR
 
       });
 
