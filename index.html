@@ -81,23 +81,23 @@
       <div id="mmr-graphs">
         <h4 class="section-header">Changes Over Time</h4>
         <p>Dota 2 tracks each player's skill progression using their Matchmaking Ranking (MMR). This value is separate for solo queue and party queue games and is updated after every ranked match.</p>
-        <svg id="party-mmr"></svg>
-        <svg id="party-mmr-change"></svg>
-        <svg id="party-mmr-absolute-change"></svg>
-        <svg id="solo-mmr"></svg>
-        <svg id="solo-mmr-change"></svg>
-        <svg id="solo-mmr-absolute-change"></svg>
+        <svg class="party" id="party-mmr"></svg>
+        <svg class="party" id="party-mmr-change"></svg>
+        <svg class="party" id="party-mmr-absolute-change"></svg>
+        <svg class="solo" id="solo-mmr"></svg>
+        <svg class="solo" id="solo-mmr-change"></svg>
+        <svg class="solo" id="solo-mmr-absolute-change"></svg>
       </div>
 
       <div id="hero-role-graphs">
         <h4 class="section-header">Hero and Role Statistics</h4>
         <p>There are currently over 110 heroes in Dota 2. In each game, each player must pick a unique hero to play as. Each of the five players is given a position or role for the game. In general, these roles are: Carry (1), Mid (2), Offlane (3), Roam (4), and Support (5). The position number determines which character gets priority for resources like gold and experience. The lower the number, the higher the priority.</p>
-        <svg id="party-roles"></svg>
-        <svg id="party-heroes"></svg>
-        <svg id="party-heroes-bar"></svg>
-        <svg id="solo-roles"></svg>
-        <svg id="solo-heroes"></svg>
-        <svg id="solo-heroes-bar"></svg>
+        <svg class="party" id="party-roles"></svg>
+        <svg class="party" id="party-heroes"></svg>
+        <svg class="party" id="party-heroes-bar"></svg>
+        <svg class="solo" id="solo-roles"></svg>
+        <svg class="solo" id="solo-heroes"></svg>
+        <svg class="solo" id="solo-heroes-bar"></svg>
       </div>
 
       <footer>
@@ -108,7 +108,23 @@
 
     <script src="https://d3js.org/d3.v5.min.js"></script>
 
+    <script type="text/javascript" src="js/main.js"></script>
+
     <script>
+
+      var padding = {t: 0, r: 0, b: 0, l: 0};
+
+      d3.csv("data/party.csv").then(function(data) {
+
+        console.log(data);
+        console.log(window.innerWidth);
+        console.log(window.innerHeight);
+
+      });
+
+    </script>
+
+    <!-- <script>
 
       // PARTY
       d3.csv("data/party.csv").then(function(data) {
@@ -685,7 +701,7 @@
 
       });
 
-    </script>
+    </script> -->
 
   </body>
 </html>
