@@ -34,6 +34,7 @@
     - add hero icon on bar graph hover (dota api?)
     - create toggle switch for party and solo views
     - experiment with average lines for line graphs
+    - add classes to axis titles and ticks for styling
     - look at replacing spacer math with padding calls
     - look over axis values (whole numbers for matches)
     - create hover tooltip for pie charts (corner of graph)
@@ -41,6 +42,7 @@
     - fix spacing of "Party MMR Change Over Time" x axis label
     - write function for smooth scroll to section from table of contents
     - create hover tooltip for line graphs (line to x axis, circle over point)
+    - look at using ternary operator to adjust ticks for different screen sizes
     - use span tags in paragraphs to discuss broader statistics (win-loss ratio)
     - standardize order of d3 code (xAxis/yAxis together, similar axis creation calls, translate with array)
     
@@ -80,7 +82,7 @@
 
       <div id="mmr-graphs">
         <h4 class="section-header">Changes Over Time</h4>
-        <p>Dota 2 tracks each player's skill progression using their Matchmaking Ranking (MMR). This value is separate for solo queue and party queue games and is updated after every ranked match. You can use the dropdown menu in the bottom left to switch between solo queue and party queue visualizations.</p>
+        <p>Dota 2 tracks each player's skill progression using their Matchmaking Ranking (MMR). This value is separate for party queue and solo queue games and is updated after every ranked match. You can use the dropdown menu in the bottom left to switch between party queue and solo queue visualizations.</p>
         <svg class="party" id="party-mmr"></svg>
         <svg class="party" id="party-mmr-change"></svg>
         <svg class="party" id="party-mmr-absolute-change"></svg>
@@ -207,12 +209,215 @@
           .text("Party MMR Change Over Time");
 
         // PARTY-MMR-ABSOLUTE-CHANGE
+        var svg = d3.select("#party-mmr-absolute-change");
+        svg.attr("width", window.innerWidth * 0.9);
+        svg.attr("height", window.innerWidth * 0.5);
+        var width = svg.attr("width") - padding.l - padding.r;
+        var height = svg.attr("height") - padding.t - padding.b;
+        var group = svg.append("g")
+          .attr("transform", "translate(" + [padding.l, padding.t] + ")");
+        var xScale = d3.scaleLinear()
+          .domain([0, data.length])
+          .range([0, width]);
+        var xAxis = d3.axisBottom(xScale);
+        group.append("g")
+          .attr("transform", "translate(" + [0, height] + ")")
+          .call(xAxis)
+          .append("text")
+          .attr("fill", "#000000")
+          .attr("text-anchor", "middle")
+          .attr("transform", "translate(" + [width / 2, spacer * 1.75] + ")")
+          .text("Matches");
+        var yScale = d3.scaleLinear()
+          .domain([0, d3.max(data, function(d) { return Math.abs(d.Change); })])
+          .range([height, 0]);
+        var yAxis = d3.axisLeft(yScale);
+        group.append("g")
+          .call(yAxis)
+          .append("text")
+          .attr("fill", "#000000")
+          .attr("text-anchor", "middle")
+          .attr("transform", "translate(" + [-spacer * 1.75, height / 2] + ") rotate(-90)")
+          .text("MMR");
+        var line = d3.line()
+          .x(function(d, i) { return xScale(i); })
+          .y(function(d) { return yScale(Math.abs(d.Change)); });
+        group.append("path")
+          .datum(data)
+          .attr("fill", "none")
+          .attr("stroke", "#000000")
+          .attr("d", line);
+        group.append("text")
+          .attr("transform", "translate(" + [width / 2, -spacer] + ")")
+          .attr("text-anchor", "middle")
+          .text("Party MMR Absolute Change Over Time");
+        var average = d3.sum(data, function(d) { return Math.abs(d.Change); }) / data.length;
+        var line = d3.line()
+          .x(function(d, i) { return xScale(i); })
+          .y(function(d, i) { return yScale(average); });
+        group.append("path")
+          .datum(data)
+          .attr("fill", "none")
+          .attr("stroke", "#000000")
+          .attr("d", line);
 
         // PARTY-ROLES
 
         // PARTY-HEROES-PIE
 
         // PARTY-HEROES-BAR
+
+      });
+
+      d3.csv("data/solo.csv").then(function(data) {
+
+        // SOLO-MMR
+        var svg = d3.select("#solo-mmr");
+        svg.attr("width", window.innerWidth * 0.9);
+        svg.attr("height", window.innerWidth * 0.5);
+        var width = svg.attr("width") - padding.l - padding.r;
+        var height = svg.attr("height") - padding.t - padding.b;
+        var group = svg.append("g")
+          .attr("transform", "translate(" + [padding.l, padding.t] + ")");
+        var xScale = d3.scaleLinear()
+          .domain([0, data.length])
+          .range([0, width]);
+        var xAxis = d3.axisBottom(xScale);
+        group.append("g")
+          .attr("transform", "translate(" + [0, height] + ")")
+          .call(xAxis)
+          .append("text")
+          .attr("fill", "#000000")
+          .attr("text-anchor", "middle")
+          .attr("transform", "translate(" + [width / 2, spacer * 1.75] + ")")
+          .text("Matches");
+        var yScale = d3.scaleLinear()
+          .domain(d3.extent(data, function(d) { return d.MMR; }))
+          .range([height, 0]);
+        var yAxis = d3.axisLeft(yScale);
+        group.append("g")
+          .call(yAxis)
+          .append("text")
+          .attr("fill", "#000000")
+          .attr("text-anchor", "middle")
+          .attr("transform", "translate(" + [-spacer * 2.25, height / 2] + ") rotate(-90)")
+          .text("MMR");
+        var line = d3.line()
+          .x(function(d, i) { return xScale(i); })
+          .y(function(d) { return yScale(d.MMR); });
+        group.append("path")
+          .datum(data)
+          .attr("fill", "none")
+          .attr("stroke", "#000000")
+          .attr("d", line);
+        group.append("text")
+          .attr("transform", "translate(" + [width / 2, -spacer] + ")")
+          .attr("text-anchor", "middle")
+          .text("Solo MMR Over Time");
+
+        // SOLO-MMR-CHANGE
+        var svg = d3.select("#solo-mmr-change");
+        svg.attr("width", window.innerWidth * 0.9);
+        svg.attr("height", window.innerWidth * 0.5);
+        var width = svg.attr("width") - padding.l - padding.r;
+        var height = svg.attr("height") - padding.t - padding.b;
+        var group = svg.append("g")
+          .attr("transform", "translate(" + [padding.l, padding.t] + ")");
+        var xScale = d3.scaleLinear()
+          .domain(d3.extent([0, data.length]))
+          .range([0, width]);
+        var xAxis = d3.axisBottom(xScale);
+        var yScale = d3.scaleLinear()
+          .domain(d3.extent(data, function(d) { return +d.Change; }))
+          .range([height, 0]);
+        var yAxis = d3.axisLeft(yScale);
+        group.append("g")
+          .attr("transform", "translate(" + [0, yScale(0)] + ")")
+          .call(xAxis)
+          .append("text")
+          .attr("fill", "#000000")
+          .attr("text-anchor", "middle")
+          .attr("transform", "translate(" + [width / 2, spacer * 5] + ")")
+          .text("Matches");
+        group.append("g")
+          .call(yAxis)
+          .append("text")
+          .attr("fill", "#000000")
+          .attr("text-anchor", "middle")
+          .attr("transform", "translate(" + [-spacer * 2.25, height / 2] + ") rotate(-90)")
+          .text("MMR Change");
+        var line = d3.line()
+          .x(function(d, i) { return xScale(i); })
+          .y(function(d) { return yScale(d.Change); });
+        group.append("path")
+          .datum(data)
+          .attr("fill", "none")
+          .attr("stroke", "#000000")
+          .attr("d", line);
+        group.append("text")
+          .attr("fill", "#000000")
+          .attr("transform", "translate(" + [width / 2, -spacer] + ")")
+          .attr("text-anchor", "middle")
+          .text("Solo MMR Change Over Time");
+
+        // SOLO-MMR-ABSOLUTE-CHANGE
+        var svg = d3.select("#solo-mmr-absolute-change");
+        svg.attr("width", window.innerWidth * 0.9);
+        svg.attr("height", window.innerWidth * 0.5);
+        var width = svg.attr("width") - padding.l - padding.r;
+        var height = svg.attr("height") - padding.t - padding.b;
+        var group = svg.append("g")
+          .attr("transform", "translate(" + [padding.l, padding.t] + ")");
+        var xScale = d3.scaleLinear()
+          .domain([0, data.length])
+          .range([0, width]);
+        var xAxis = d3.axisBottom(xScale);
+        group.append("g")
+          .attr("transform", "translate(" + [0, height] + ")")
+          .call(xAxis)
+          .append("text")
+          .attr("fill", "#000000")
+          .attr("text-anchor", "middle")
+          .attr("transform", "translate(" + [width / 2, spacer * 1.75] + ")")
+          .text("Matches");
+        var yScale = d3.scaleLinear()
+          .domain([0, d3.max(data, function(d) { return Math.abs(d.Change); })])
+          .range([height, 0]);
+        var yAxis = d3.axisLeft(yScale);
+        group.append("g")
+          .call(yAxis)
+          .append("text")
+          .attr("fill", "#000000")
+          .attr("text-anchor", "middle")
+          .attr("transform", "translate(" + [-spacer * 1.75, height / 2] + ") rotate(-90)")
+          .text("MMR");
+        var line = d3.line()
+          .x(function(d, i) { return xScale(i); })
+          .y(function(d) { return yScale(Math.abs(d.Change)); });
+        group.append("path")
+          .datum(data)
+          .attr("fill", "none")
+          .attr("stroke", "#000000")
+          .attr("d", line);
+        group.append("text")
+          .attr("transform", "translate(" + [width / 2, -spacer] + ")")
+          .attr("text-anchor", "middle")
+          .text("Solo MMR Absolute Change Over Time");
+        var average = d3.sum(data, function(d) { return Math.abs(d.Change); }) / data.length;
+        var line = d3.line()
+          .x(function(d, i) { return xScale(i); })
+          .y(function(d, i) { return yScale(average); });
+        group.append("path")
+          .datum(data)
+          .attr("fill", "none")
+          .attr("stroke", "#000000")
+          .attr("d", line);
+
+        // SOLO-ROLES
+
+        // SOLO-HEROES-PIE
+
+        // SOLO-HEROES-BAR
 
       });
 

@@ -7,4 +7,4 @@ function hideGraphs(graphsArray) {
     }
 }
 
-hideGraphs(soloGraphs);
+// hideGraphs(soloGraphs);
