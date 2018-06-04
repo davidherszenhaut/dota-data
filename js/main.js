@@ -9,7 +9,27 @@ function hideGraphs(graphsArray) {
     }
 }
 
-// hideGraphs(soloGraphs);
+function showGraphs() {
+    for (var i = 0; i < partyGraphs.length; i++) {
+        partyGraphs[i].style.display = "block";
+    }
+    for (var i = 0; i < soloGraphs.length; i++) {
+        soloGraphs[i].style.display = "block";
+    }
+}
+
+function queueSelect() {
+    var value = document.getElementById("queue-select").value;
+    if (value == "Party") {
+        showGraphs();
+        hideGraphs(soloGraphs);
+    } else if (value == "Solo") {
+        showGraphs();
+        hideGraphs(partyGraphs);
+    } else {
+        showGraphs();
+    }
+}
 
 // GO TO TOP BUTTON
 

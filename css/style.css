@@ -161,6 +161,8 @@ header {
 
 #contents li a {
   text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: all 300ms ease-in-out;
 }
 
 #contents li a:link {
@@ -172,7 +174,7 @@ header {
 }
 
 #contents li a:hover {
-  text-decoration: underline;
+  border-bottom: 1px solid #888888;
   color: #888888;
 }
 
@@ -183,6 +185,11 @@ header {
 #contents li:before {
   content: "#";
   padding-right: 0.5rem;
+  transition: all 300ms ease-in-out;
+}
+
+#contents li:hover::before {
+  color: #888888;
 }
 
 .section-header {
@@ -212,6 +219,28 @@ text {
   font-family: "Roboto Condensed", sans-serif;
 }
 
+#queue-select {
+  position: fixed;
+  bottom: 2vh;
+  left: 1vh;
+  width: 6vh;
+  height: 5vh;
+  font-family: "Roboto Condensed", sans-serif;
+  border: none;
+  background: #eeeeee;
+  color: #444444;
+  border-radius: 5px;
+  box-shadow: 0px 0px 5px #000000;
+  cursor: pointer;
+  transition: all 300ms ease-in-out;
+}
+
+#queue-select:hover {
+  background: #444444;
+  color: #eeeeee;
+  box-shadow: 0px 0px 0px #ffffff;
+}
+
 #go-to-top-btn {
   display: none;
   position: fixed;
@@ -226,6 +255,7 @@ text {
   background: #eeeeee;
   color: #444444;
   cursor: pointer;
+  transition: all 300ms ease-in-out;
 }
 
 button:after {

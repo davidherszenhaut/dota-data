@@ -29,6 +29,7 @@
     - create hover tooltip for bar charts
     - research how to make responsive svg
     - create floating scroll back to top button
+    - continue styling select (highlight color)
     - create "Party/Solo Games Per Day" histogram
     - move repeated .attr and .style calls to css
     - add hero icon on bar graph hover (dota api?)
@@ -101,6 +102,12 @@
         <svg class="solo" id="solo-heroes-pie"></svg>
         <svg class="solo" id="solo-heroes-bar"></svg>
       </div>
+
+      <select onchange="queueSelect()" id="queue-select">
+        <option value="Both">Both</option>
+        <option value="Party">Party</option>
+        <option value="Solo">Solo</option>
+      </select>
 
       <button onclick="goToTop()" id="go-to-top-btn" title="Go to the top of the page."></button>
 
