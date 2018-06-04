@@ -102,6 +102,8 @@
         <svg class="solo" id="solo-heroes-bar"></svg>
       </div>
 
+      <button onclick="goToTop()" id="go-to-top-btn" title="Go to the top of the page."></button>
+
       <footer>
         <h2>David Herszenhaut &copy; 2018</h2>
       </footer>
@@ -116,6 +118,10 @@
 
       var spacer = window.innerWidth * 0.05;
       var padding = {t: spacer * 2, r: spacer * 2, b: spacer * 2, l: spacer * 3};
+
+      // var colorScale = d3.scaleLinear()
+      //   .domain([minValue, maxValue])
+      //   .range([minColor, maxColor]);
 
       d3.csv("data/party.csv").then(function(data) {
 
