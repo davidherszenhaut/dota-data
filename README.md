@@ -1,5 +1,5 @@
 # dota-data
 
-Data visualizations of my Dota 2 Matchmaking Rating (MMR) and other statistics created using the D3.js JavaScript framework.
+Visualizations of my Dota 2 Matchmaking Rating (and other statistics) built using the D3 JavaScript framework.
 
 [Dota Data](https://davidherszenhaut.github.io/dota-data/)
